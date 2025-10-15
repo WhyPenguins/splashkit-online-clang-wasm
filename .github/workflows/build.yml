@@ -39,22 +39,22 @@ jobs:
           mkdir -p wasi-sysroot/lib/clang/16.0.4
           mv lib wasi-sysroot/lib/clang/16.0.4/
           
-          git clone --branch llvmorg-16.0.4 --depth 1 https://github.com/llvm/llvm-project
+          # git clone --branch llvmorg-16.0.4 --depth 1 https://github.com/llvm/llvm-project
 
-          cd llvm-project/
-          cmake -G Ninja -S llvm -B build-host -DCMAKE_BUILD_TYPE=Release
-          cmake --build build-host --target llvm-tblgen
+          # cd llvm-project/
+          # cmake -G Ninja -S llvm -B build-host -DCMAKE_BUILD_TYPE=Release
+          # cmake --build build-host --target llvm-tblgen
           
-          echo "set_target_properties(lld PROPERTIES LINK_FLAGS \"-sEXPORT_ALL -sEXPORTED_FUNCTIONS=['__ZN4llvm3sys15CleanupOnSignalEm','_main'] -Os -sNO_INVOKE_RUN -sIMPORTED_MEMORY -sINITIAL_MEMORY=64MB -sEXIT_RUNTIME -sSTACK_SIZE=10MB -sASSERTIONS -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=FS,callMain -sMODULARIZE -sEXPORT_NAME=Lld -sWASM_BIGINT --preload-file=../../wasi-sysroot/lib@/lib\")" >> llvm/CMakeLists.txt
-          echo "set_target_properties(clang PROPERTIES LINK_FLAGS \"-sEXPORT_ALL -sEXPORTED_FUNCTIONS=['__ZN4llvm3sys15CleanupOnSignalEm','_main'] -Os -sNO_INVOKE_RUN -sIMPORTED_MEMORY -sINITIAL_MEMORY=64MB -sEXIT_RUNTIME -sSTACK_SIZE=10MB -sASSERTIONS -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=FS,callMain -sMODULARIZE -sEXPORT_NAME=Clang -sWASM_BIGINT\")" >> llvm/CMakeLists.txt
+          # echo "set_target_properties(lld PROPERTIES LINK_FLAGS \"-sEXPORT_ALL -sEXPORTED_FUNCTIONS=['__ZN4llvm3sys15CleanupOnSignalEm','_main'] -Os -sNO_INVOKE_RUN -sIMPORTED_MEMORY -sINITIAL_MEMORY=64MB -sEXIT_RUNTIME -sSTACK_SIZE=10MB -sASSERTIONS -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=FS,callMain -sMODULARIZE -sEXPORT_NAME=Lld -sWASM_BIGINT --preload-file=../../wasi-sysroot/lib@/lib\")" >> llvm/CMakeLists.txt
+          # echo "set_target_properties(clang PROPERTIES LINK_FLAGS \"-sEXPORT_ALL -sEXPORTED_FUNCTIONS=['__ZN4llvm3sys15CleanupOnSignalEm','_main'] -Os -sNO_INVOKE_RUN -sIMPORTED_MEMORY -sINITIAL_MEMORY=64MB -sEXIT_RUNTIME -sSTACK_SIZE=10MB -sASSERTIONS -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=FS,callMain -sMODULARIZE -sEXPORT_NAME=Clang -sWASM_BIGINT\")" >> llvm/CMakeLists.txt
 
           # Not going to lie, a lot of these flags are just from trial and error to reduce the build size + compile time... I'm unsure which ones are actually needed
-          EMCC_DEBUG=2 CXXFLAGS="-Dwait4=__syscall_wait4" emcmake cmake -G Ninja -S llvm -B build_min -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_INSTALL_PREFIX=install -DLLVM_TARGET_ARCH=wasm32-emscripten -DLLVM_DEFAULT_TARGET_TRIPLE=wasm32-wasi -DLLVM_ENABLE_PROJECTS='lld;clang' -DLLVM_HOST_TRIPLE="WASI" -DLLVM_ENABLE_THREADS=OFF -DLLVM_TARGETS_TO_BUILD="WebAssembly" -DCLANG_ENABLE_STATIC_ANALYZER=ON -DCLANG_BUILD_TOOLS=OFF -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1 -DLLVM_TABLEGEN=$PWD/build-host/bin/llvm-tblgen
+          # EMCC_DEBUG=2 CXXFLAGS="-Dwait4=__syscall_wait4" emcmake cmake -G Ninja -S llvm -B build_min -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_INSTALL_PREFIX=install -DLLVM_TARGET_ARCH=wasm32-emscripten -DLLVM_DEFAULT_TARGET_TRIPLE=wasm32-wasi -DLLVM_ENABLE_PROJECTS='lld;clang' -DLLVM_HOST_TRIPLE="WASI" -DLLVM_ENABLE_THREADS=OFF -DLLVM_TARGETS_TO_BUILD="WebAssembly" -DCLANG_ENABLE_STATIC_ANALYZER=ON -DCLANG_BUILD_TOOLS=OFF -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1 -DLLVM_TABLEGEN=$PWD/build-host/bin/llvm-tblgen
           
           #cmake --build build_min --target lld
           #cmake --build build_min --target clang
 
-          cd ../
+          # cd ../
           
           mkdir -p llvm-project/build_min/bin/
           echo "This is a test!" >> llvm-project/build_min/bin/clang.wasm
@@ -91,7 +91,7 @@ jobs:
           tag_name="${{ github.ref_name }}"
           file_name=$(echo $tag_name | sed "s#/#_#")
 
-          echo "../release.zip" >> ../../script/.github/workflows/release_assets.txt
+          echo "../release.zip" >> ../script/.github/workflows/release_assets.txt
 
           python3 ../script/.github/workflows/edit_release.py "update" "${{ secrets.GITHUB_TOKEN }}" "${{ github.repository }}" "$tag_name" "${{ github.sha }}" no "../script/.github/workflows/release_assets.txt" "# Release ($tag_name)"
 
