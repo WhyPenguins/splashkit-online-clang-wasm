@@ -45,7 +45,7 @@ jobs:
           cmake -G Ninja -S llvm -B build-host -DCMAKE_BUILD_TYPE=Release
           cmake --build build-host --target llvm-tblgen
           
-          echo "set_target_properties(lld PROPERTIES LINK_FLAGS \"-sEXPORT_ALL -sEXPORTED_FUNCTIONS=['__ZN4llvm3sys15CleanupOnSignalEm','_main'] -Os -sNO_INVOKE_RUN -sIMPORTED_MEMORY -sINITIAL_MEMORY=64MB -sEXIT_RUNTIME -sSTACK_SIZE=10MB -sASSERTIONS -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=FS,callMain -sMODULARIZE -sEXPORT_NAME=Lld -sWASM_BIGINT --preload-file=../../wasi-sysroot/lib@/lib\")" >> llvm/CMakeLists.txt
+          echo "set_target_properties(lld PROPERTIES LINK_FLAGS   \"-sEXPORT_ALL -sEXPORTED_FUNCTIONS=['__ZN4llvm3sys15CleanupOnSignalEm','_main'] -Os -sNO_INVOKE_RUN -sIMPORTED_MEMORY -sINITIAL_MEMORY=64MB -sEXIT_RUNTIME -sSTACK_SIZE=10MB -sASSERTIONS -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=FS,callMain -sMODULARIZE -sEXPORT_NAME=Lld   -sWASM_BIGINT\")" >> llvm/CMakeLists.txt
           echo "set_target_properties(clang PROPERTIES LINK_FLAGS \"-sEXPORT_ALL -sEXPORTED_FUNCTIONS=['__ZN4llvm3sys15CleanupOnSignalEm','_main'] -Os -sNO_INVOKE_RUN -sIMPORTED_MEMORY -sINITIAL_MEMORY=64MB -sEXIT_RUNTIME -sSTACK_SIZE=10MB -sASSERTIONS -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=FS,callMain -sMODULARIZE -sEXPORT_NAME=Clang -sWASM_BIGINT\")" >> llvm/CMakeLists.txt
 
           # Not going to lie, a lot of these flags are just from trial and error to reduce the build size + compile time... I'm unsure which ones are actually needed
