@@ -88,10 +88,11 @@ jobs:
           sudo apt-get install zip sed
 
           echo "Branch Release! ${{ github.ref_name }}"
-          tag_name="tag/${{ github.ref_name }}"
+          name="${{ github.ref_name }}"
+          tag_name="release/$name"
           file_name=$(echo $tag_name | sed "s#/#_#")
 
           echo "../release.zip" >> ../script/.github/workflows/release_assets.txt
 
-          python3 ../script/.github/workflows/edit_release.py "update" "${{ secrets.GITHUB_TOKEN }}" "${{ github.repository }}" "$tag_name" "${{ github.sha }}" no "../script/.github/workflows/release_assets.txt" "# Release ($tag_name)"
+          python3 ../script/.github/workflows/edit_release.py "update" "${{ secrets.GITHUB_TOKEN }}" "${{ github.repository }}" "$tag_name" "${{ github.sha }}" no "../script/.github/workflows/release_assets.txt" "# Release ($name)" "$name"
 
