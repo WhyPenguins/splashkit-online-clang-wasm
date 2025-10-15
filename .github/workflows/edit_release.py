@@ -10,7 +10,7 @@ import sys
 assert len(sys.argv[1:]) > 1
 assert sys.argv[1] == "update" or sys.argv[1] == "delete"
 if sys.argv[1] == "update":
-    assert len(sys.argv[1:]) == 8
+    assert len(sys.argv[1:]) == 9
     assert sys.argv[6] == "yes" or sys.argv[6] == "no"
 else:
     assert len(sys.argv[1:]) == 4
