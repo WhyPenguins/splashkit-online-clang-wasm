@@ -2,8 +2,10 @@ name: Build Clang/LLD Artefacts
 
 on:
   push:
-    tags:
+    branches:
       - 'v*'
+      - "latest"
+      - "main"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -14,6 +16,10 @@ concurrency:
 
 jobs:
   build:
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Build Clang & LLD
@@ -61,26 +67,31 @@ jobs:
         env:
           GITHUB_TOKEN: ''
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      - name: Checkout scripts
+        uses: actions/checkout@v4
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Clang & LLD!
-          draft: false
-          prerelease: false
+          path: script
+          sparse-checkout: |
+            .github/workflows/
+          sparse-checkout-cone-mode: false
 
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout Repo for Tagging
+        uses: actions/checkout@v4
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./release.zip
-          asset_name: sko-clang-lld.zip
-          asset_content_type: application/zip
+          path: repo
+          submodules: 'false'
+          fetch-depth: '0'
+
+      - name: Create/Update release
+        working-directory: ./repo
+        run: |
+          sudo apt-get install zip sed
+
+          echo "Branch Release! ${{ github.ref_name }}"
+          tag_name="${{ github.ref_name }}"
+          file_name=$(echo $tag_name | sed "s#/#_#")
+
+          echo "../release.zip" >> ../../script/.github/workflows/release_assets.txt
+
+          python3 ../script/.github/workflows/edit_release.py "update" "${{ secrets.GITHUB_TOKEN }}" "${{ github.repository }}" "$tag_name" "${{ github.sha }}" no "../script/.github/workflows/release_assets.txt" "# Release ($tag_name)"
+
