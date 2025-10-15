@@ -4,7 +4,7 @@ import requests
 import os
 import sys
 
-#edit_release.py update <token> <username/repo> <tag> <SHA> <is_prerelease (yes/no)> <assetsfile> <description>
+#edit_release.py update <token> <username/repo> <tag> <SHA> <is_prerelease (yes/no)> <assetsfile> <description> <name>
 #edit_release.py delete <token> <username/repo> <tag>
 
 assert len(sys.argv[1:]) > 1
@@ -39,9 +39,9 @@ def get_release(tag_name):
     response = requests.get(url, headers=HEADERS)
     return response.json() if response.status_code == 200 else None
 
-def create_release(tag_name):
+def create_release(name, tag_name):
     url = f"{API_BASE}/releases"
-    payload = {"tag_name": tag_name, "name": tag_name, "draft": False, "body": sys.argv[8].replace("\\n","\n"), "prerelease": sys.argv[6]=="yes"}
+    payload = {"tag_name": tag_name, "name": name, "draft": False, "body": sys.argv[8].replace("\\n","\n"), "prerelease": sys.argv[6]=="yes"}
     response = requests.post(url, headers=HEADERS, json=payload)
     if response.status_code == 201:
         return response.json()
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         sha = sys.argv[5]
         create_or_update_tag(tag_name, sha)
 
-        release = get_release(tag_name) or create_release(tag_name)
+        release = get_release(tag_name) or create_release(sys.argv[9], tag_name)
         release_id = release["id"]
 
         with open(sys.argv[7], "r") as file:
